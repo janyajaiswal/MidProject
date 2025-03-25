@@ -17,7 +17,7 @@ def create_app():
     mongo.init_app(app)
     jwt.init_app(app)
 
-    app.fs = gridfs.GridFS(mongo.db)
+    app.fs = gridfs.GridFS(mongo.cx.get_database())#acessing mongodb
 
     from routes.auth_routes import auth_bp
     from routes.student_routes import student_bp
