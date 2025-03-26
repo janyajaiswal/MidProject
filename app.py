@@ -4,24 +4,24 @@ import os
 from flask import Flask
 from flask_pymongo import PyMongo
 from flask_jwt_extended import JWTManager
-from config import MONGO_URI, SECRET_KEY
 from utils.error_handlers import register_error_handlers
 import gridfs
 
+# ✅ Load environment variables first
+load_dotenv()
 
+# ✅ Now access environment variables
 MONGO_URI = os.getenv("MONGO_URI")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-load_dotenv()
 mongo = PyMongo()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
-    load_dotenv()
 
-    app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-    app.config["JWT_SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config["MONGO_URI"] = MONGO_URI
+    app.config["JWT_SECRET_KEY"] = SECRET_KEY
 
     mongo.init_app(app)
     jwt.init_app(app)
@@ -29,12 +29,12 @@ def create_app():
     if mongo.cx is None:
         raise RuntimeError("❌ Mongo client not initialized.")
 
-    print("✅ Connected to DB:", mongo.cx.list_database_names())  # Safe here
+    print("✅ Connected to DB:", mongo.cx.list_database_names())
 
     app.db = mongo.cx["midproject"]
     app.fs = gridfs.GridFS(app.db)
 
-    # Register blueprints
+    # ✅ Register blueprints
     from routes.auth_routes import auth_bp
     from routes.student_routes import student_bp
     from routes.professor_routes import professor_bp
@@ -46,12 +46,11 @@ def create_app():
     app.register_blueprint(public_bp, url_prefix="/")
 
     print("🔁 Registered routes:")
-    print(app.url_map)
+    for rule in app.url_map.iter_rules():
+        print(f"{rule} → {rule.endpoint}")
 
     register_error_handlers(app)
-
     return app
-
 
 if __name__ == "__main__":
     app = create_app()

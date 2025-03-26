@@ -19,7 +19,7 @@ def upload_note():
     filename = secure_filename(file.filename)
     file_id = current_app.fs.put(file, filename=filename, content_type=file.content_type)
 
-    mongo.db.files.insert_one({
+    current_app.db.files.insert_one({
         "filename": filename,
         "uploader": user["username"],
         "role": "student",
@@ -28,4 +28,4 @@ def upload_note():
         "uploaded_at": datetime.datetime.utcnow()
     })
 
-    return jsonify({"msg": "Note uploaded", "file_id": str(file_id)}), 201
+    return jsonify({"msg": "✅ Note uploaded successfully", "file_id": str(file_id)}), 201
