@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 from utils.jwt_auth import role_required
-from app import mongo
 import datetime
 
 professor_bp = Blueprint("professor", __name__)
@@ -19,7 +18,8 @@ def upload_material():
     filename = secure_filename(file.filename)
     file_id = current_app.fs.put(file, filename=filename, content_type=file.content_type)
 
-    mongo.db.files.insert_one({
+    # ✅ Use current_app.db instead of mongo.db
+    current_app.db.files.insert_one({
         "filename": filename,
         "uploader": user["username"],
         "role": "professor",
