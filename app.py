@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import certifi  
 
 from flask import Flask
 from flask_pymongo import PyMongo
@@ -7,20 +8,21 @@ from flask_jwt_extended import JWTManager
 from utils.error_handlers import register_error_handlers
 import gridfs
 
-# ✅ Load environment variables first
+# ✅ Load environment variables
 load_dotenv()
 
-# ✅ Now access environment variables
-MONGO_URI = os.getenv("MONGO_URI")
-SECRET_KEY = os.getenv("SECRET_KEY")
-
+# ✅ Now access variables
 mongo = PyMongo()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
 
-    app.config["MONGO_URI"] = MONGO_URI
+    MONGO_URI = os.getenv("MONGO_URI")  # ✅ INSIDE create_app
+    SECRET_KEY = os.getenv("SECRET_KEY")
+
+    # ✅ Append certifi CA bundle to ensure SSL handshake
+    app.config["MONGO_URI"] = MONGO_URI + "&tlsCAFile=" + certifi.where()
     app.config["JWT_SECRET_KEY"] = SECRET_KEY
 
     mongo.init_app(app)
@@ -34,7 +36,7 @@ def create_app():
     app.db = mongo.cx["midproject"]
     app.fs = gridfs.GridFS(app.db)
 
-    # ✅ Register blueprints
+    # ✅ Blueprints
     from routes.auth_routes import auth_bp
     from routes.student_routes import student_bp
     from routes.professor_routes import professor_bp
