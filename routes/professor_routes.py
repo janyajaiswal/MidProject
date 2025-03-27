@@ -2,12 +2,11 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import get_jwt_identity
 from werkzeug.utils import secure_filename
 from utils.jwt_auth import role_required
+from bson import ObjectId
 import datetime
 
 professor_bp = Blueprint("professor", __name__)
-
-# Max file size in bytes (5MB)
-MAX_FILE_SIZE = 5 * 1024 * 1024
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 @professor_bp.route("/materials/upload", methods=["POST"])
 @role_required("professor")
@@ -18,9 +17,9 @@ def upload_material():
     if not file or not file.filename.lower().endswith((".pdf", ".doc", ".docx", ".ppt", ".pptx")):
         return jsonify({"error": "Invalid file type"}), 400
 
-    file.seek(0, 2)  # Move to end of file
+    file.seek(0, 2)
     size = file.tell()
-    file.seek(0)     # Reset pointer
+    file.seek(0)
 
     if size > MAX_FILE_SIZE:
         return jsonify({"error": "File size exceeds 5MB limit"}), 400
@@ -38,3 +37,19 @@ def upload_material():
     })
 
     return jsonify({"msg": "✅ Material uploaded successfully", "file_id": str(file_id)}), 201
+
+@professor_bp.route("/materials/delete/<file_id>", methods=["DELETE"])
+@role_required("professor")
+def delete_material(file_id):
+    user = get_jwt_identity()
+    try:
+        file = current_app.db.files.find_one({"_id": ObjectId(file_id), "uploader": user["username"]})
+        if not file:
+            return jsonify({"error": "File not found or access denied"}), 404
+
+        current_app.fs.delete(file["gridfs_id"])
+        current_app.db.files.delete_one({"_id": ObjectId(file_id)})
+
+        return jsonify({"msg": "🗑️ Material deleted successfully"}), 200
+    except Exception:
+        return jsonify({"error": "Invalid file ID"}), 400
