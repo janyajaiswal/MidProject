@@ -51,10 +51,10 @@
 
   Create a .env file in the root directory with the following keys:
   
- <prev> <code> MONGO_URI=mongodb+srv://<username>:<password>@mscs.ywi7l.mongodb.net/?retryWrites=true&w=majority&appName=MSCS
+ <prev> <code> MONGO_URI=mongodb+srv://__username__:__password__@mscs.ywi7l.mongodb.net/?retryWrites=true&w=majority&appName=MSCS
   JWT_SECRET_KEY=your_secret_key </prev> </code>
   
-  Replace <username> and <password> with your MongoDB Atlas credentials.
+  Replace __username__ and __password__ with your MongoDB Atlas credentials.
 
 ## **API Endpoints**
 
