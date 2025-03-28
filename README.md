@@ -22,16 +22,30 @@
   -	Testing Tools: Postman
 
 ## **Installation**
-  1.	Clone the repository:
-  git clone https://github.com/janyajaiswal/MidProject.git
-  cd MidProject
+  1. Clone the Repository
+
+    git clone https://github.com/janyajaiswal/MidProject.git
+    
+    cd MidProject
+
+
+  2. Create and Activate a Virtual Environment (Recommended)
+
+
+  **For macOS/Linux:**
   
-  3.	Create and activate a virtual environment (optional but recommended):
-  python -m venv venv
-  source venv/bin/activate   # For Windows: venv\Scripts\activate
+    python -m venv venv
+    source venv/bin/activate
+
+
+  **For Windows:**
   
-  3.	Install dependencies:
-  pip install -r requirements.txt
+    python -m venv venv
+    venv\Scripts\activate
+  
+  3. Install Dependencies
+
+    pip install -r requirements.txt
 
 ## **Environment Variables**
 
